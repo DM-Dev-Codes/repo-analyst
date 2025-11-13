@@ -1,0 +1,18 @@
+[project]
+name = "repo-analyst"
+version = "1.0.0"
+description = "AI agent for explaining httpx code using MCP and GPT-4"
+readme = "README.md"
+authors = [{name = "David Marks"}]
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.121.1",
+    "mcp[cli]>=1.21.0",
+    "pydantic>=2.12.4",
+    "pydantic-ai>=1.14.1",
+    "python-dotenv>=1.2.1",
+    "slowapi>=0.1.9",
+    "uvicorn>=0.38.0",
+]
+
+

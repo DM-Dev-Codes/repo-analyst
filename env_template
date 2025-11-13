@@ -1,0 +1,16 @@
+# ============================================
+# REQUIRED: OpenAI API Configuration
+# ============================================
+# Get your API key from: https://platform.openai.com/api-keys
+# Replace 'sk-your-key-here' with your actual API key
+OPENAI_API_KEY=sk-your-key-here
+
+# ============================================
+# OPTIONAL: Advanced Configuration
+# ============================================
+
+# HTTPX source directory (default: /app/httpx/httpx for Docker, ./httpx/httpx for local)
+# HTTPX_SOURCE_DIR=/app/httpx/httpx
+
+# MCP server URL (default: http://localhost:8001/mcp/sse)
+# MCP_SERVER_URL=http://localhost:8001/mcp/sse
