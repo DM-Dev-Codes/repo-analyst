@@ -48,7 +48,7 @@ class LookupBuilder:
         results = self._read_file_content()
         self._extract_metadata_from_trees(results)
         logger.info(f"Built lookup table with {len(self.lookup_table)} keys")
-        return self.lookup_table
+        
 
     def _read_file_content(self) -> list[tuple[Path, Path, ast.AST]]:
         """Parse Python files into AST trees.
