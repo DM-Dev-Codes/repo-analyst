@@ -15,43 +15,26 @@ This project implements **Track A: Grounded Mode (MCP + Semi-Natural Language)**
 - MCP-powered tool integration
 - Fast AST-based indexing (509 symbols pre-loaded)
 
-## Quick Start (Docker) - Simplest Setup!
+## Quick Start
 
 ### Prerequisites
 
 - Docker
-- OpenAI API key (get one from https://platform.openai.com/api-keys)
+- OpenAI API key ([get one here](https://platform.openai.com/api-keys))
 
-### Build and Run
-
-**That's it! Just pass your OpenAI API key:**
+### Run
 
 ```bash
-# Build image (downloads httpx and sets up everything)
+# Build image
 docker build -t repo-analyst .
 
 # Run with your API key
-docker run -p 8001:8001 \
-  -e OPENAI_API_KEY=sk-proj-your-actual-key-here \
-  repo-analyst
+docker run -p 8001:8001 -e OPENAI_API_KEY=sk-proj-your-key-here repo-analyst
 ```
 
-**Optional:** If you prefer storing your key in a file:
-```bash
-# Create .env and add your key
-echo "OPENAI_API_KEY=sk-proj-your-key" > .env
+Server starts on `http://localhost:8001`
 
-# Run (extracts key from .env)
-docker run -p 8001:8001 \
-  -e OPENAI_API_KEY="$(grep '^OPENAI_API_KEY=' .env | cut -d'=' -f2- | tr -d '\"')" \
-  repo-analyst
-```
-
-**Docker handles everything:** httpx clone, paths, MCP URL. You only provide the API key!
-
-The server will start on `http://localhost:8001`
-
-### 3. Query the API
+### Query the API
 
 ```bash
 curl -X POST http://localhost:8001/query -d "Explain Client.get"
@@ -61,28 +44,20 @@ curl -X POST http://localhost:8001/query -d "Explain Response.stream"
 
 ## Local Development (without Docker)
 
-**For local dev, you need to set up .env and clone httpx manually:**
-
 ```bash
-# 1. Install dependencies (uv creates venv automatically)
+# Install dependencies
 uv sync
 
-# 2. Clone httpx repository
+# Clone httpx
 git clone https://github.com/encode/httpx.git
 
-# 3. Configure environment - REQUIRED for local dev
+# Configure environment
 cp env_template .env
+# Edit .env: Set OPENAI_API_KEY and MCP_SERVER_URL=http://localhost:8001/mcp/sse
 
-# 4. Edit .env and set these REQUIRED values:
-#    OPENAI_API_KEY=sk-proj-your-actual-key
-#    MCP_SERVER_URL=http://localhost:8001/mcp/sse
-#    (HTTPX_SOURCE_DIR defaults to ./httpx/httpx - usually no need to change)
-
-# 5. Run server
+# Run
 python main.py
 ```
-
-**Note:** Docker users skip all this - Docker handles cloning, paths, and MCP URL automatically!
 
 ## Example Queries
 
@@ -122,37 +97,6 @@ Response (finds all implementations):
 See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed design documentation.
 
 **Flow:** User → FastAPI → Validation → Agent → MCP Tool → LookupBuilder → OpenAI → Response
-
-## Docker Compose (Alternative)
-
-**Just pass your OpenAI API key:**
-
-Create `docker-compose.yml`:
-
-```yaml
-version: '3.8'
-services:
-  repo-analyst:
-    build: .
-    ports:
-      - "8001:8001"
-    environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-    healthcheck:
-      test: ["CMD", ".venv/bin/python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/docs').read()"]
-      interval: 30s
-      timeout: 3s
-      retries: 3
-```
-
-Run with your API key:
-```bash
-# Pass key directly
-OPENAI_API_KEY=sk-proj-your-key docker-compose up --build
-
-# Or load from .env file
-export $(grep '^OPENAI_API_KEY=' .env | xargs) && docker-compose up --build
-```
 
 ## API Reference
 
@@ -228,23 +172,15 @@ grep ERROR app.log*
 
 ## Troubleshooting
 
-**"OPENAI_API_KEY not found"**  
-- **Docker:** Pass `-e OPENAI_API_KEY=your-key` when running container
-- **Local dev:** Create `.env` file from `env_template` and add your key
+**"OPENAI_API_KEY not found"**
+- Docker: Pass `-e OPENAI_API_KEY=your-key` when running
+- Local: Set in `.env` file
 
-**"MCP_SERVER_URL not found"**  
-- **Docker:** Nothing needed, auto-configured
-- **Local dev:** Add `MCP_SERVER_URL=http://localhost:8001/mcp/sse` to your `.env`
+**"httpx directory not found"**
+- Local: Run `git clone https://github.com/encode/httpx.git`
 
-**"httpx directory not found"**  
-- **Docker:** Automatically cloned, shouldn't happen
-- **Local dev:** Run `git clone https://github.com/encode/httpx.git`
-
-**Rate limit errors**  
-Wait 1 minute or adjust limit in `http_server.py` line 21
-
-**Docker health check failing**  
-Increase `start-period` in Dockerfile if initialization takes longer
+**Rate limit errors**
+- Wait 1 minute or adjust in `http_server.py` line 21
 
 ## Assumptions & Limitations
 
