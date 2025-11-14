@@ -1,6 +1,5 @@
 """Code explanation agent using Pydantic AI and MCP."""
 
-import asyncio
 import logging
 import os
 
@@ -129,10 +128,6 @@ class CodeLocatorAgent:
             return self._create_error_response(
                 "The AI returned an unexpected response format. Please try again."
             )
-
-        except (asyncio.TimeoutError, TimeoutError) as e:
-            logger.error(f"Request timeout: {e}")
-            return self._create_error_response("Request timed out. Please try again.")
 
         except Exception as e:
             logger.exception(f"Unexpected agent error: {e}")
