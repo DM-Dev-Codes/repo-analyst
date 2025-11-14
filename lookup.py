@@ -4,13 +4,11 @@ import ast
 import logging
 import os
 from pathlib import Path
-from typing import List
 
 from metadata import SymbolMetadata
 
 HTTPX_DIR = os.getenv(
-    "HTTPX_SOURCE_DIR", 
-    str(Path(__file__).parent / "httpx" / "httpx")
+    "HTTPX_SOURCE_DIR", str(Path(__file__).parent / "httpx" / "httpx")
 )
 
 logger = logging.getLogger(__name__)
@@ -18,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 class LookupBuilder:
     """Build and query symbol lookup table from Python source files."""
-    
+
     def __init__(self, httpx_dir: str | None = None) -> None:
         """Initialize lookup builder.
 
@@ -39,20 +37,18 @@ class LookupBuilder:
         self.lookup_table: dict[str, list[SymbolMetadata]] = {}
         logger.debug(f"Initialized with root_dir: {self.root_dir}")
 
-    def build(self) -> dict[str, list[SymbolMetadata]]:
+    def build(self) -> None:
         """Build lookup table from source files.
-        
-        Returns:
-            Symbol lookup table mapping qualified names to metadata
+
+        The lookup table is stored in self.lookup_table and can be accessed directly.
         """
         results = self._read_file_content()
         self._extract_metadata_from_trees(results)
         logger.info(f"Built lookup table with {len(self.lookup_table)} keys")
-        
 
     def _read_file_content(self) -> list[tuple[Path, Path, ast.AST]]:
         """Parse Python files into AST trees.
-        
+
         Returns:
             List of (absolute_path, relative_path, ast_tree) tuples
         """
@@ -81,7 +77,7 @@ class LookupBuilder:
         self, results: list[tuple[Path, Path, ast.AST]]
     ) -> None:
         """Extract symbol metadata from AST trees.
-        
+
         Args:
             results: List of (absolute_path, relative_path, ast_tree) tuples
         """
@@ -114,7 +110,7 @@ class LookupBuilder:
         parent_class: str | None = None,
     ) -> None:
         """Add symbol metadata to lookup table.
-        
+
         Args:
             node: AST node (function, method, or class)
             node_type: Type string ('class', 'function', or 'method')
@@ -144,12 +140,12 @@ class LookupBuilder:
         """Convert file path to module name."""
         return ".".join(file_path.with_suffix("").parts)
 
-    def query_symbols(self, symbols: List[str]) -> List[SymbolMetadata]:
+    def query_symbols(self, symbols: list[str]) -> list[SymbolMetadata]:
         """Query lookup table for symbols.
-        
+
         Args:
             symbols: List of symbol names to find
-            
+
         Returns:
             List of matching symbol metadata
         """
@@ -180,13 +176,13 @@ class LookupBuilder:
 
     def get_code_chunk(self, metadata: SymbolMetadata) -> str:
         """Read code chunk from file.
-        
+
         Args:
             metadata: Symbol metadata with file path and line numbers
-            
+
         Returns:
             Source code string
-            
+
         Raises:
             FileNotFoundError: If file doesn't exist
             ValueError: If line numbers are invalid
