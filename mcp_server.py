@@ -63,7 +63,7 @@ async def get_source_code(symbols: list[str]) -> SymbolLookupResult:
                 code_chunk = f"# ERROR: {chunk_err}"
 
             citation = f"{metadata.file_path}:{metadata.start_line}-{metadata.end_line}"
-            
+
             try:
                 match = SymbolMatch(
                     metadata=metadata, code=code_chunk, citation=citation

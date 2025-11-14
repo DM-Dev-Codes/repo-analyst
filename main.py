@@ -47,7 +47,7 @@ if __name__ == "__main__":
     logger.info("Main API: http://0.0.0.0:8001/query (POST)")
     logger.info("MCP SSE:  http://0.0.0.0:8001/mcp/sse")
     logger.info("=" * 60)
-    
+
     uvicorn.run(
         app,
         host="0.0.0.0",
