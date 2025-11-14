@@ -1,16 +1,18 @@
 # ============================================
-# REQUIRED: OpenAI API Configuration
+# REQUIRED for LOCAL development only
+# (Docker users: Just pass -e OPENAI_API_KEY=your-key)
 # ============================================
+
 # Get your API key from: https://platform.openai.com/api-keys
-# Replace 'sk-your-key-here' with your actual API key
 OPENAI_API_KEY=sk-your-key-here
+
+# REQUIRED for local dev (Docker auto-configures this)
+MCP_SERVER_URL=http://localhost:8001/mcp/sse
 
 # ============================================
 # OPTIONAL: Advanced Configuration
 # ============================================
 
-# HTTPX source directory (default: /app/httpx/httpx for Docker, ./httpx/httpx for local)
-# HTTPX_SOURCE_DIR=/app/httpx/httpx
-
-# MCP server URL (default: http://localhost:8001/mcp/sse)
-# MCP_SERVER_URL=http://localhost:8001/mcp/sse
+# HTTPX source directory (defaults to ./httpx/httpx for local, /app/httpx/httpx for Docker)
+# Only set this if you cloned httpx to a non-standard location
+# HTTPX_SOURCE_DIR=./httpx/httpx

@@ -1,0 +1,53 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual environments (don't copy local venv to container)
+.venv/
+venv/
+env/
+ENV/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs (don't copy old logs to image)
+*.log
+app.log*
+
+# Documentation
+*.md
+IMPROVEMENTS.md
+QUICKSTART.md
+
+# Tests (optional - exclude if not running tests in container)
+test_*.py
+tests/
+
+# Local httpx (will be cloned fresh in container)
+httpx/
+
+# Environment files (secrets shouldn't be in image)
+.env
+.env.*
+
+# Lock files for other package managers
+Pipfile
+Pipfile.lock
+poetry.lock
+requirements.txt
+

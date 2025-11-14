@@ -15,40 +15,39 @@ This project implements **Track A: Grounded Mode (MCP + Semi-Natural Language)**
 - MCP-powered tool integration
 - Fast AST-based indexing (509 symbols pre-loaded)
 
-## Quick Start (Docker)
+## Quick Start (Docker) - Simplest Setup!
 
 ### Prerequisites
 
 - Docker
-- **OpenAI API key** (required - get one from https://platform.openai.com/api-keys)
+- OpenAI API key (get one from https://platform.openai.com/api-keys)
 
-### 1. Configure Environment
+### Build and Run
 
-**IMPORTANT:** You must set your OpenAI API key before running.
-
-```bash
-# Copy template and add your API key
-cp env_template .env
-
-# Edit .env and replace with your actual OpenAI API key
-# Change: OPENAI_API_KEY=sk-your-key-here
-# To:     OPENAI_API_KEY=sk-proj-...your-actual-key...
-```
-
-### 2. Build and Run
+**That's it! Just pass your OpenAI API key:**
 
 ```bash
-# Build image
+# Build image (downloads httpx and sets up everything)
 docker build -t repo-analyst .
 
-# Run container with your API key from .env file
-docker run --env-file .env -p 8001:8001 repo-analyst
+# Run with your API key
+docker run -p 8001:8001 \
+  -e OPENAI_API_KEY=sk-proj-your-actual-key-here \
+  repo-analyst
 ```
 
-**Alternative:** Pass API key directly:
+**Optional:** If you prefer storing your key in a file:
 ```bash
-docker run -e OPENAI_API_KEY=sk-proj-your-key -p 8001:8001 repo-analyst
+# Create .env and add your key
+echo "OPENAI_API_KEY=sk-proj-your-key" > .env
+
+# Run (extracts key from .env)
+docker run -p 8001:8001 \
+  -e OPENAI_API_KEY="$(grep '^OPENAI_API_KEY=' .env | cut -d'=' -f2- | tr -d '\"')" \
+  repo-analyst
 ```
+
+**Docker handles everything:** httpx clone, paths, MCP URL. You only provide the API key!
 
 The server will start on `http://localhost:8001`
 
@@ -62,20 +61,28 @@ curl -X POST http://localhost:8001/query -d "Explain Response.stream"
 
 ## Local Development (without Docker)
 
+**For local dev, you need to set up .env and clone httpx manually:**
+
 ```bash
-# Install dependencies (uv creates venv automatically)
+# 1. Install dependencies (uv creates venv automatically)
 uv sync
 
-# Configure environment
-cp env_template .env
-# Edit .env with your OPENAI_API_KEY
-
-# Clone httpx repository (if not already present)
+# 2. Clone httpx repository
 git clone https://github.com/encode/httpx.git
 
-# Run server
+# 3. Configure environment - REQUIRED for local dev
+cp env_template .env
+
+# 4. Edit .env and set these REQUIRED values:
+#    OPENAI_API_KEY=sk-proj-your-actual-key
+#    MCP_SERVER_URL=http://localhost:8001/mcp/sse
+#    (HTTPX_SOURCE_DIR defaults to ./httpx/httpx - usually no need to change)
+
+# 5. Run server
 python main.py
 ```
+
+**Note:** Docker users skip all this - Docker handles cloning, paths, and MCP URL automatically!
 
 ## Example Queries
 
@@ -118,6 +125,8 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed design documentation.
 
 ## Docker Compose (Alternative)
 
+**Just pass your OpenAI API key:**
+
 Create `docker-compose.yml`:
 
 ```yaml
@@ -127,8 +136,6 @@ services:
     build: .
     ports:
       - "8001:8001"
-    env_file:
-      - .env
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
     healthcheck:
@@ -138,9 +145,13 @@ services:
       retries: 3
 ```
 
-Run (make sure .env file exists with your API key):
+Run with your API key:
 ```bash
-docker-compose up --build
+# Pass key directly
+OPENAI_API_KEY=sk-proj-your-key docker-compose up --build
+
+# Or load from .env file
+export $(grep '^OPENAI_API_KEY=' .env | xargs) && docker-compose up --build
 ```
 
 ## API Reference
@@ -218,10 +229,16 @@ grep ERROR app.log*
 ## Troubleshooting
 
 **"OPENAI_API_KEY not found"**  
-Create `.env` file from `env_template` and add your key
+- **Docker:** Pass `-e OPENAI_API_KEY=your-key` when running container
+- **Local dev:** Create `.env` file from `env_template` and add your key
+
+**"MCP_SERVER_URL not found"**  
+- **Docker:** Nothing needed, auto-configured
+- **Local dev:** Add `MCP_SERVER_URL=http://localhost:8001/mcp/sse` to your `.env`
 
 **"httpx directory not found"**  
-Docker automatically clones it. For local dev: `git clone https://github.com/encode/httpx.git`
+- **Docker:** Automatically cloned, shouldn't happen
+- **Local dev:** Run `git clone https://github.com/encode/httpx.git`
 
 **Rate limit errors**  
 Wait 1 minute or adjust limit in `http_server.py` line 21
