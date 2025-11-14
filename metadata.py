@@ -1,12 +1,11 @@
 """Pydantic models for code symbols and explanations."""
 
-from typing import List
-
 from pydantic import BaseModel, Field
 
 
 class SymbolMetadata(BaseModel):
     """Metadata for a code symbol (class, function, or method)."""
+
     type: str
     name: str
     parent_class: str | None
@@ -38,5 +37,5 @@ class SymbolMatch(BaseModel):
 class SymbolLookupResult(BaseModel):
     """Lookup result with all matches and optional error."""
 
-    matches: List[SymbolMatch] = []
+    matches: list[SymbolMatch] = []
     error: str | None = None
